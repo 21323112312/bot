@@ -1,0 +1,30 @@
+from telegram import Update
+from telegram.ext import ApplicationBuilder, CommandHandler, MessageHandler, filters
+
+# Токен вашего бота
+BOT_TOKEN = "7677087503:AAHuuJK_L1bqKV9_p4j_hX4BSnJgFBXUv8E"
+
+# Обработчик сообщений
+async def handle_message(update: Update, context):
+    if "идиот" in update.message.text.lower():
+        # Удаляем сообщение
+        await update.message.delete()
+
+# Старт команды (опционально)
+async def start(update: Update, context):
+    await update.message.reply_text("Привет! пожалуйста не выражайтесь")
+
+# Основной код
+def main():
+    app = ApplicationBuilder().token(BOT_TOKEN).build()
+
+    # Обработчики
+    app.add_handler(CommandHandler("start", start))
+    app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
+
+    # Запуск бота
+    print("Бот запущен...")
+    app.run_polling()
+
+if __name__ == "__main__":
+    main()
