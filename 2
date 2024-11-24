@@ -1,0 +1,47 @@
+import requests
+from telegram import Update
+from telegram.ext import ApplicationBuilder, CommandHandler, MessageHandler, filters
+
+# Токен вашего бота
+BOT_TOKEN = '8128566813:AAGFuEpziuiL5bImqFNV3JQckeF1O_OOKuI'
+
+# Ваш API-ключ OpenWeatherMap
+API_KEY = 'fb94c1573cfe4f387470f3c7d55a69a5'
+
+# Функция для получения погоды
+def get_weather():
+    url = f'http://api.openweathermap.org/data/2.5/weather?q=Istanbul&appid={API_KEY}&units=metric&lang=ru'
+    response = requests.get(url)
+    data = response.json()
+
+    if response.status_code == 200:
+        # Извлекаем данные о погоде
+        weather = data['weather'][0]['description']
+        temp = data['main']['temp']
+        humidity = data['main']['humidity']
+        wind_speed = data['wind']['speed']
+
+        # Формируем сообщение
+        weather_report = f"Погода в Стамбуле:\n{weather.capitalize()}\nТемпература: {temp}°C\nВлажность: {humidity}%\nВетер: {wind_speed} м/с"
+        return weather_report
+    else:
+        return "Не удалось получить данные о погоде."
+
+# Функция для обработки команды /weather
+async def weather(update: Update, context):
+    weather_report = get_weather()  # Получаем погоду
+    await update.message.reply_text(weather_report)  # Отправляем сообщение с погодой
+
+# Запуск бота
+def main():
+    app = ApplicationBuilder().token(BOT_TOKEN).build()
+
+    # Добавляем обработчик для команды /weather
+    app.add_handler(CommandHandler("weather", weather))
+
+    # Запуск бота
+    print("Бот запущен...")
+    app.run_polling()
+
+if __name__ == "__main__":
+    main()
